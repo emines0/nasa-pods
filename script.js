@@ -14,6 +14,23 @@ const apiUrl = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}&count=${ap
 let resultsArray = [];
 let favorites = {}; //using object instead of array - easier way for delte based on key
 
+function showContent(page) {
+  window.scrollTo({
+    top: 0,
+    behaviour: 'instant' //scroll install to the top
+  });
+
+  if(page === 'results') {
+    resultsNav.classList.remove('hidden');
+    favoritesNav.classList.add('hidden')
+  }else{
+    resultsNav.classList.add('hidden');
+    favoritesNav.classList.remove('hidden')
+  }
+
+  loader.classList.add('hidden');
+}
+
 function createDOMNodes(page) {
   const currentArray = page === 'results' ? resultsArray : Object.values(favorites); //Object.values - convert object to array for using foreach
   currentArray.forEach((result) => {
@@ -83,16 +100,18 @@ function updateDOM(page) {
   }
   imagesContainer.textContent = '';
   createDOMNodes(page);
-
+  showContent(page);
 }
 
 // Get 10 images from NASA API
 async function getNasaPictures() {
+  // Show loader
+  loader.classList.remove('hidden');
   try {
     const response = await fetch(apiUrl);
     resultsArray = await response.json();
     
-    updateDOM('favorites');
+    updateDOM('results');
 
   } catch (error) {
     // Catch Error Here
